@@ -31,19 +31,14 @@ class LineBotHandler:
             self.debt_manager.add_debt(user_id2, user_id1, -amount)
             reply_text = f"{user_id1}が{user_id2}に{amount}円を貸しました。"
         
-        elif "-" in message.text:
-            message_list = message_text.replace("-", "").split()
-            assert len(message_list) == 2
-            user_id1, user_id2, amount = message_list[0], message_list[1], 0
-            self.debt_manager.set_debt(user_id1, user_id2, amount)
-            self.debt_manager.set_debt(user_id2, user_id1, amount)
-            reply_text = f"{user_id1}と{user_id2}の借金をinitしました。"
-        
         elif "show" in message.text:
             message_list = message_text.replace("show", "").split()
             user_id1, user_id2 = message_list[0], message_list[1]
             amount = self.debt_manager.get_debt(user_id1, user_id2)
-            reply_text = f"{user_id1}が{user_id2}に{amount}円貸りています。"
+            if amount == "not_found":
+                reply_text = f"{user_id1}と{user_id2}の借金はありません。"
+            else:
+                reply_text = f"{user_id1}が{user_id2}に{amount}円貸りています。"
         
         
         # ユーザーにメッセージを返す

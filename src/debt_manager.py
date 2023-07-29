@@ -13,10 +13,14 @@ class DebtManager:
                 'user_id2': user_id2
             }
             response = self.dynamo_db.get_item(key)
-            return response["item"].get("debt")
+            if "Item" in response:
+                item = response["Item"]
+                return item["debt"]
+            else:
+                return "not_found"
         except Exception as e:
             print(f"Error getting debt: {str(e)}")
-            return None
+            return f"Error getting debt: {str(e)}"
 
     def set_debt(self, user_id1, user_id2, amount):
         # user_id1からuser_id2への借金の量を設定します。
@@ -37,9 +41,8 @@ class DebtManager:
                 'user_id1': user_id1,
                 'user_id2': user_id2
             }
-            update_expression = 'ADD amount :inc'
+            update_expression = 'ADD debt :inc'
             expression_attribute_values = {':inc': int(amount)}
-            return_values='UPDATED_NEW'
-            response = self.dynamo_db.update_item(key, update_expression, expression_attribute_values, return_values)
+            response = self.dynamo_db.update_item(key, update_expression, expression_attribute_values)
         except Exception as e:
             return (f"Error adding debt: {str(e)}")
