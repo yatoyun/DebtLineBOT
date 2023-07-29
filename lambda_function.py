@@ -1,20 +1,31 @@
-from .src.line_debt_bot import LineBotHandler
-from .src.message import Message
+from src.line_debt_bot import LineBotHandler
+from src.message import Message
+import json
+
 
 def lambda_handler(event, context):
-    # Lineからのメッセージをパースする
-    messages = parse_line_messages(event)
-    
     # LineBotHandlerを初期化する
     bot_handler = LineBotHandler(table_name="DebtLineBot")
-    
-    # 各メッセージを処理する
-    for message in messages:
-        bot_handler.handle_message(message)
 
-def parse_line_messages(event):
-    messages = []
-    for msg in event:
-        message = Message(msg['type'], msg['text'], msg['source'])
-        messages.append(message)
-    return messages
+    # Lineからのメッセージをパースする
+    parse_line_messages(event, bot_handler)
+
+    return {
+        "statusCode": 200,
+        "body": json.dumps(
+            {
+                "message": "ok",
+            }
+        ),
+    }
+
+
+def parse_line_messages(event, bot_handler):
+    for msg in json.loads(event["body"])["events"]:
+        if msg["type"] == "message" and msg["message"]["type"] == "text":
+            message = Message(msg["type"], msg["message"]["text"], msg["source"]["userId"])
+            bot_handler.handle_message(message, msg["replyToken"])
+        else:
+            print("message type is not text")
+
+

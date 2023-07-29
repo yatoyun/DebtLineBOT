@@ -8,7 +8,7 @@ class DynamoDB:
     def get_item(self, key):
         # get item from DynamoDB using the key
         response = self.table.get_item(Key=key)
-        return response['Item']
+        return response
 
     def put_item(self, item):
         # put item into DynamoDB
