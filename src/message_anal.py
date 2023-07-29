@@ -25,13 +25,27 @@ def lambda_handler(event, context):
             lender, borrower = parts[0], parts[2]
 
             # DynamoDBへの保存
-            table.put_item(
-                Item={
+            # table.update_item(
+            #     Item={
+            #         'lender': lender,
+            #         'borrower': borrower,
+            #         'amount': amount,
+            #     }
+            # )
+            table.update_item(
+                Key={
                     'lender': lender,
                     'borrower': borrower,
-                    'amount': amount,
-                }
+
+                },
+                ExpressionAttributeValues={
+                    ':inc': int(amount),
+
+                },
+                UpdateExpression='ADD amount :inc',
+                ReturnValues='UPDATED_NEW',
             )
+
             reply_text = f'{lender}が{amount}円を{borrower}に貸しました。'
 
         # ユーザーにメッセージを返す
