@@ -1,12 +1,26 @@
+import boto3
+from ..config import config
+
 class DynamoDB:
+    def __init__(self, table_name):
+        dynamodb = boto3.resource('dynamodb')
+        self.table = dynamodb.Table(table_name)
+        
     def get_item(self, key):
-        # DynamoDBから指定されたキーのアイテムを取得します。
-        pass
+        # get item from DynamoDB using the key
+        response = self.table.get_item(Key=key)
+        return response['Item']
 
     def put_item(self, item):
-        # 指定されたアイテムをDynamoDBに追加します。
-        pass
+        # put item into DynamoDB
+        response = self.table.put_item(Item=item)
+        return response
 
     def update_item(self, key, update_expression, expression_attribute_values):
-        # DynamoDBの指定されたキーのアイテムを更新します。
-        pass
+        response = self.table.update_item(
+            Key=key,
+            UpdateExpression=update_expression,
+            ExpressionAttributeValues=expression_attribute_values,
+            ReturnValues='UPDATED_NEW'
+        )
+        return response
