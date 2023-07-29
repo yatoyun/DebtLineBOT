@@ -1,5 +1,4 @@
 import boto3
-from ..config import config
 
 class DynamoDB:
     def __init__(self, table_name):
